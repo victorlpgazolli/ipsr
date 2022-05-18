@@ -1,0 +1,1 @@
+Worker responsible for receiving incoming packages CID uploads and indexing database for showing this new package to user with metadata
