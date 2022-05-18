@@ -9,15 +9,16 @@ IPSR (Interplanetary Software Repository) is a **distributed software repository
 
 ### Workflow
 ```
+```
                 ┌────────────┐        ┌──────────────────────────┐
                 │            │ action │                          │
             ┌───┤  publish   ├────────┤  validate package info   │
             │   │            │        │                          │
-            │   └────────────┘        └──────────────────────────┘          ┌────────────────────────────────────────────────┐
-            │                                                               │                                                │
-            │                                                               │    POST /api/v1/package/[author]/[package]     │
-            │                                                               │                                                │
-            │                         ┌───────────────────────┐      ┌─────►│    params:                                     │
+            │   └────────────┘        └───────────┬──────────────┘          ┌────────────────────────────────────────────────┐
+            │                                     │                         │                                                │
+            │                                     │                         │    POST /api/v1/package/[author]/[package]     │
+            │                                     │                         │                                                │
+            │                         ┌───────────▼───────────┐      ┌─────►│    params:                                     │
             │                         │                       │      │      │      metadata                                  │
             │                    ┌────┤ POST /api/v1/publish  ├──────┘      │      cid                                       │
             │                    │    │                       │             │                                                │
@@ -69,4 +70,5 @@ IPSR (Interplanetary Software Repository) is a **distributed software repository
 │  workers  ├────┤  indexer  ├──┤ consume key   ├──►│  set package key with cid and metadata in redis       │
 │           │    │           │  │               │   │                                                       │
 └───────────┘    └───────────┘  └───────────────┘   └───────────────────────────────────────────────────────┘
+```
 ```
