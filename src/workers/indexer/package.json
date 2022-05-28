@@ -1,0 +1,16 @@
+{
+  "name": "indexer",
+  "version": "1.0.0",
+  "description": "Worker responsible for receiving incoming packages CID uploads and indexing database for showing this new package to user with metadata",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ipfs-core": "^0.14.3",
+    "ipfs-http-client": "^56.0.3",
+    "redis": "^4.1.0"
+  }
+}

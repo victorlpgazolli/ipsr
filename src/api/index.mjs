@@ -13,7 +13,7 @@ const DEFAULT_HEADER = {
 }
 
 /*
-* cid example: QmZyUEQVuRK3XV7L9Dk26pg6RVSgaYkiSTEdnT2kZZdwoi
+* cid example: QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco
 * metadata example:
 * {
 *     version: "1",
@@ -67,8 +67,8 @@ const handleCreatePackage = async (req, res) => {
 
         const client = net.createConnection({ port: 6379 }, () => {
             const command = [
-                "LPUSH",
-                "v0:package:worker",
+                "PUBLISH",
+                "v0:internal:worker",
                 Buffer.from(JSON.stringify(requestPayload)).toString('base64'),
                 "\r\n"
             ].join(" ")
@@ -110,4 +110,4 @@ http.createServer(async (req, res) => {
     } finally {
         return res.end();
     }
-}).listen(3000)
+}).listen(3001)
