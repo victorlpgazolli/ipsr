@@ -3,7 +3,9 @@ import http from 'http'
 import net from 'net'
 import QueryString from 'qs';
 import { createClient } from 'redis';
+import dotenv from 'dotenv';
 import semver from 'semver';
+dotenv.config();
 const redis = createClient();
 await redis.connect();
 const STATUS_CODES = {
@@ -139,4 +141,4 @@ http.createServer(async (req, res) => {
     } finally {
         return res.end();
     }
-}).listen(3001)
+}).listen(process.env.PORT)
