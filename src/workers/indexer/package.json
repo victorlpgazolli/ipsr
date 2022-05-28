@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "ipfs-core": "^0.14.3",
-    "redis": "^4.1.0"
+    "redis": "^4.1.0",
+    "semver": "^7.3.7"
   }
 }

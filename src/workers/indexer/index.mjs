@@ -2,6 +2,7 @@ import assert from 'assert';
 import http from 'http'
 import { createClient } from 'redis';
 import * as IPFS from 'ipfs-core'
+import semver from 'semver'
 
 const redisClient = createClient();
 const subscriber = createClient();
@@ -47,6 +48,12 @@ const handleSubscription = async rawMessage => {
         }
     } = payload.metadata;
 
+    const validVersion = semver.valid(semver.coerce(version))
+
+    if (!validVersion) {
+        console.log("version do not match semver validation");
+        return
+    }
 
     const directoryPath = [
         "/ipfs",
@@ -88,14 +95,14 @@ const handleSubscription = async rawMessage => {
         "v0",
         "package",
         bundleIdentifier,
-        version
+        validVersion
     ].join(":");
 
     const filePayload = {
         pathToFile,
         size,
         fileName,
-        version,
+        version: validVersion,
         bundleIdentifier
     }
 
