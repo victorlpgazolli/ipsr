@@ -1,7 +1,11 @@
 import assert from 'assert';
 import http from 'http'
 import net from 'net'
-
+import QueryString from 'qs';
+import { createClient } from 'redis';
+import semver from 'semver';
+const redis = createClient();
+await redis.connect();
 const STATUS_CODES = {
     NOT_FOUND: 404,
     INTERNAL_SERVER_ERROR: 500,
@@ -18,6 +22,7 @@ const DEFAULT_HEADER = {
 * {
 *     version: "1",
 *     package: {
+*         author: "nome",
 *         fileName: "package.apk",
 *         target: "mobile",
 *         version: "1.0.0",
@@ -43,6 +48,7 @@ const validateBodyFromPackage = (packageToCreate) => {
         assert(!!metadata, "metadata object must exist");
         assert(isValidString(metadata.version), "metadata.version must be a string");
         assert(!!metadata.package, "metadata.package object must exist");
+        assert(isValidString(metadata.package?.author), "metadata.package.author must be a string");
         assert(isValidString(metadata.package?.fileName), "metadata.package.fileName must be a string");
         assert(isValidString(metadata.package?.target), "metadata.package.target must be a string");
         assert(metadata.package?.target in AVAILABLE_TARGETS, "metadata.package.target must be a valid one: " + Object.keys(AVAILABLE_TARGETS));
@@ -65,30 +71,53 @@ const handleCreatePackage = async (req, res) => {
             return res.end(JSON.stringify({ error: payloadError }));
         }
 
-        const client = net.createConnection({ port: 6379 }, () => {
-            const command = [
-                "PUBLISH",
-                "v0:internal:worker",
-                Buffer.from(JSON.stringify(requestPayload)).toString('base64'),
-                "\r\n"
-            ].join(" ")
-            console.log(command);
-            client.write(command);
-            client.end()
-        });
+        await redis.publish("v0:internal:worker", Buffer.from(JSON.stringify(requestPayload)).toString('base64'))
 
-        res.end(JSON.stringify(requestPayload))
+        res.end(JSON.stringify(requestPayload));
     }
+};
+const handleGetPackage = async (req, res) => {
+    const {
+        author,
+        bundleId,
+        version: rawVersion
+    } = req.query;
+    const version = semver.valid(semver.coerce(rawVersion));
+
+    const key = [
+        "v0",
+        "package",
+        author,
+        bundleId,
+        version ? version : "*"
+    ].join(":");
+    const [packageDesired] = await redis.keys(key);
+    if (!packageDesired) {
+        res.writeHeader(STATUS_CODES.NOT_FOUND);
+        res.end(JSON.stringify({
+            error: `package ${author}/${bundleId}@${version ? version : "latest"} not found`
+        }));
+        return;
+    }
+    const [latestFromVersion] = await redis.lRange(packageDesired, 0, 1);
+    res.end(latestFromVersion);
 };
 
 const routes = {
-    "/api/v1/packages:post": handleCreatePackage
+    "/api/v1/package:get": handleGetPackage,
+    "/api/v1/packages:post": handleCreatePackage,
 }
 
 http.createServer(async (req, res) => {
 
     const { url, method } = req;
-    const routePath = `${url}:${method.toLowerCase()}`;
+    const [rawUrl, rawParams] = url.split("?");
+    req.query = {}
+    if (rawParams) {
+        const params = QueryString.parse(rawParams);
+        req.query = params;
+    }
+    const routePath = `${rawUrl}:${method.toLowerCase()}`;
 
     const {
         [routePath]: apiCallHandler

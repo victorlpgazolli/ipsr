@@ -4,7 +4,10 @@
   "description": "CLI for package creators upload and download CID packages from ipsr",
   "main": "index.js",
   "dependencies": {
-    "commander": "^9.3.0"
+    "axios": "^0.27.2",
+    "commander": "^9.3.0",
+    "semver": "^7.3.7",
+    "zx": "^6.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

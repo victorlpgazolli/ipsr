@@ -8,5 +8,10 @@
     "start": "node index.mjs"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "qs": "^6.10.3",
+    "redis": "^4.1.0",
+    "semver": "^7.3.7"
+  }
 }

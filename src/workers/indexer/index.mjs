@@ -42,6 +42,7 @@ const handleSubscription = async rawMessage => {
     );
     const {
         package: {
+            author,
             fileName,
             version,
             bundleIdentifier
@@ -94,6 +95,7 @@ const handleSubscription = async rawMessage => {
     const fileKey = [
         "v0",
         "package",
+        author,
         bundleIdentifier,
         validVersion
     ].join(":");
